@@ -19,5 +19,14 @@ module Publishable
     def published?
       self.published_at.present? and self.published_at <= DateTime.now
     end
+    
+    def publish(at = DateTime.now)
+      update_attribute(:published_at, at)
+    end
+    
+    def unpublish
+      update_attribute(:published_at, nil)
+    end
+    
   end
 end

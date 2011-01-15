@@ -68,5 +68,20 @@ class PublishableTest < ActiveSupport::TestCase
   def test_publshed?
     assert @published.published?
   end
+
+  def test_publish
+    @draft.publish
+    @draft.published?
+  end
+
+  def test_unpublish
+    @published.unpublish
+    @published.draft?
+  end
+  
+  def test_future_publish
+    @draft.publish(1.week.from_now)
+    assert @draft.draft?
+  end
   
 end
