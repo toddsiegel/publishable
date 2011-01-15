@@ -40,12 +40,17 @@ module Publishable
     end
     
     def publish(at = DateTime.now)
-      update_attribute(column_name, at)
+      change_state(at)
     end
     
     def unpublish
-      update_attribute(column_name, nil)
+      change_state(nil)
     end
-    
+
+    private
+      def change_state(val)
+        send column_name + "=", val
+        save
+      end
   end
 end
