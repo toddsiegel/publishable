@@ -9,5 +9,18 @@ Example
   class Article < ActiveRecord::Base
     publishable
   end
+  
+  article = Article.new
+
+  article.draft?      # true
+  article.published?  # false
+
+  article.publish     # true
+  article.published?  # true
+  article.draft?      # false
+  
+  article.unpublish   # => true
+  article.draft?      # => true
+  article.published?  # => false
 
 Copyright (c) 2011 Todd Siegel, released under the MIT license
