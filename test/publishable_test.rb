@@ -1,11 +1,7 @@
 require 'test_helper'
 require 'active_record'
 
-#TODO: add publish method
-#TODO: add unpublish method
-#TODO: add published scope
-#TODO: add draft scope
-#TODO: add future_published scope
+#TODO: investigate using update attribute vs. save
 #TODO: add :column override
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
@@ -41,8 +37,14 @@ class PublishableTest < ActiveSupport::TestCase
   def setup
     setup_db
     @draft = Publishable.create!
+    @drafts = []
+    3.times { |i| @drafts<< Publishable.create! }
+
     @future_published = Publishable.create!(:published_at => 1.week.from_now)
+    
     @published = Publishable.create!(:published_at => 1.week.ago)
+    @publisheds = []
+    3.times { |i| @publisheds<< Publishable.create!(:published_at => 1.week.ago) }
   end
   
   def teardown
@@ -84,4 +86,15 @@ class PublishableTest < ActiveSupport::TestCase
     assert @draft.draft?
   end
   
+  def test_drafts_scope
+    assert_equal [@draft, @drafts[0], @drafts[1], @drafts[2], @future_published], Publishable.drafts
+  end
+  
+  def test_published_scope
+    assert_equal [@published, @publisheds[0], @publisheds[1], @publisheds[2]], Publishable.published
+  end
+  
+  def test_future_published_scope
+    assert_equal [@future_published], Publishable.published_later
+  end
 end
