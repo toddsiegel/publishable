@@ -1,13 +1,13 @@
 Publishable
 ===========
 
-Introduction goes here.
-
+A plugin to support simple publish status functionality. A publishable can exist in one of two states: published or draft.
 
 Example
 =======
 
-Example goes here.
+  class Article < ActiveRecord::Base
+    publishable
+  end
 
-
-Copyright (c) 2011 [name of plugin creator], released under the MIT license
+Copyright (c) 2011 Todd Siegel, released under the MIT license
