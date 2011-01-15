@@ -6,34 +6,45 @@ module Publishable
   module ClassMethods
 
     #TODO: move named_scopes out of class_eval
-    def publishable
+
+    def publishable(options = {})
+      configuration = { :column => "published_at"}
+      configuration.update(options) if options.is_a?(Hash)
+
+
       class_eval <<-EOV
         include Publishable::InstanceMethods
-        named_scope :drafts,  lambda { { :conditions => ["published_at IS NULL OR published_at > ?", DateTime.now] } }
-        named_scope :published,  lambda { { :conditions => ["published_at <= ?", DateTime.now] } }
+
+        def column_name
+          "#{configuration[:column]}"
+        end
+    
+        named_scope :drafts,  lambda { { :conditions => ["#{configuration[:column]} IS NULL OR #{configuration[:column]} > ?", DateTime.now] } }
+        named_scope :published,  lambda { { :conditions => ["#{configuration[:column]} <= ?", DateTime.now] } }
+        
+        def self.published_later
+          drafts.find(:all, :conditions => ["#{configuration[:column]} IS NOT NULL"])
+        end
       EOV
-      
-      def published_later
-        drafts.find(:all, :conditions => ["published_at IS NOT NULL"])
-      end
     end
   end
   
   module InstanceMethods
+
     def draft?
       !self.published?
     end
     
     def published?
-      self.published_at.present? and self.published_at <= DateTime.now
+      self[column_name].present? and self[column_name] <= DateTime.now
     end
     
     def publish(at = DateTime.now)
-      update_attribute(:published_at, at)
+      update_attribute(column_name, at)
     end
     
     def unpublish
-      update_attribute(:published_at, nil)
+      update_attribute(column_name, nil)
     end
     
   end

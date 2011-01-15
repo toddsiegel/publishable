@@ -2,7 +2,6 @@ require 'test_helper'
 require 'active_record'
 
 #TODO: investigate using update attribute vs. save
-#TODO: add :column override
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 require File.dirname(__FILE__) + '/../init'
@@ -14,10 +13,13 @@ ActiveRecord::Base.establish_connection(:adapter => "mysql",
                                         :socket => "/tmp/mysql.sock",
                                         :database => "publishable_test")
 
+#Supress schema output
+$stdout = StringIO.new
+
 def setup_db
   ActiveRecord::Schema.define(:version => 1) do
     create_table :publishables do |t|
-      t.column :published_at, :datetime
+      t.column :pub_date, :datetime
     end
   end
 end
@@ -31,7 +33,7 @@ end
 class PublishableTest < ActiveSupport::TestCase
 
   class Publishable < ActiveRecord::Base
-    publishable
+    publishable :column => :pub_date
   end
 
   def setup
@@ -40,17 +42,17 @@ class PublishableTest < ActiveSupport::TestCase
     @drafts = []
     3.times { |i| @drafts<< Publishable.create! }
 
-    @future_published = Publishable.create!(:published_at => 1.week.from_now)
-    
-    @published = Publishable.create!(:published_at => 1.week.ago)
-    @publisheds = []
-    3.times { |i| @publisheds<< Publishable.create!(:published_at => 1.week.ago) }
-  end
+    @future_published = Publishable.create!(:pub_date => 1.week.from_now)
   
+    @published = Publishable.create!(:pub_date => 1.week.ago)
+    @publisheds = []
+    3.times { |i| @publisheds<< Publishable.create!(:pub_date => 1.week.ago) }
+  end
+
   def teardown
     teardown_db
   end
-  
+
   def test_draft?
     assert @draft.draft?
   end
@@ -58,7 +60,7 @@ class PublishableTest < ActiveSupport::TestCase
   def test_draft_not_publshed?
     assert !@draft.published?
   end
-
+  
   def test_future_published_is_draft?
     assert @future_published.draft?
   end
@@ -70,12 +72,12 @@ class PublishableTest < ActiveSupport::TestCase
   def test_publshed?
     assert @published.published?
   end
-
+  
   def test_publish
     @draft.publish
     @draft.published?
   end
-
+  
   def test_unpublish
     @published.unpublish
     @published.draft?
