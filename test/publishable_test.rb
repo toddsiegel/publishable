@@ -1,17 +1,12 @@
 require 'test_helper'
 require 'active_record'
 
-#TODO: investigate using update attribute vs. save
-
 $:.unshift File.dirname(__FILE__) + '/../lib'
 require File.dirname(__FILE__) + '/../init'
 
-ActiveRecord::Base.establish_connection(:adapter => "mysql",
-                                        :username => "root",
-                                        :password => "",
-                                        :host => "localhost",
-                                        :socket => "/tmp/mysql.sock",
-                                        :database => "publishable_test")
+#TODO: change to use sqlite :memory:
+ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
+                                         :database => ":memory:")
 
 #Supress schema output
 $stdout = StringIO.new
