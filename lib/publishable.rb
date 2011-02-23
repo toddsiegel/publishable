@@ -19,8 +19,8 @@ module Publishable
           "#{configuration[:column]}"
         end
     
-        named_scope :drafts,  lambda { { :conditions => ["#{configuration[:column]} IS NULL OR #{configuration[:column]} > ?", DateTime.now] } }
-        named_scope :published,  lambda { { :conditions => ["#{configuration[:column]} <= ?", DateTime.now] } }
+        scope :drafts,  lambda { { :conditions => ["#{configuration[:column]} IS NULL OR #{configuration[:column]} > ?", DateTime.now] } }
+        scope :published,  lambda { { :conditions => ["#{configuration[:column]} <= ?", DateTime.now] } }
         
         def self.published_later
           drafts.find(:all, :conditions => ["#{configuration[:column]} IS NOT NULL"])
