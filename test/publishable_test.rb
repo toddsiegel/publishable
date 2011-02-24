@@ -84,7 +84,7 @@ class PublishableTest < ActiveSupport::TestCase
   end
   
   def test_drafts_scope
-    assert_equal [@draft, @drafts[0], @drafts[1], @drafts[2], @future_published], Publishable.drafts
+    assert_equal [@draft, @drafts[0], @drafts[1], @drafts[2]], Publishable.drafts
   end
   
   def test_published_scope
