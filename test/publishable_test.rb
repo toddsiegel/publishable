@@ -1,10 +1,10 @@
 require 'test_helper'
 require 'active_record'
+require 'logger'
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 require File.dirname(__FILE__) + '/../init'
 
-#TODO: change to use sqlite :memory:
 ActiveRecord::Base.establish_connection(:adapter => "sqlite3",
                                          :database => ":memory:")
 
@@ -93,5 +93,23 @@ class PublishableTest < ActiveSupport::TestCase
   
   def test_future_published_scope
     assert_equal [@future_published], Publishable.published_later
+  end
+  
+  def test_mass_publish
+    pub_count = Publishable.published.count
+    draft_count = Publishable.drafts.count
+    Publishable.publish(@drafts.map{ |p| p.id })
+    
+    assert_equal(draft_count-3, Publishable.drafts.count)
+    assert_equal(pub_count+3, Publishable.published.count)
+  end
+  
+  def test_mass_unpublish
+    pub_count = Publishable.published.count
+    draft_count = Publishable.drafts.count
+    Publishable.unpublish(@publisheds.map{ |p| p.id })
+    
+    assert_equal(draft_count+3, Publishable.drafts.count)
+    assert_equal(pub_count-3, Publishable.published.count)
   end
 end
